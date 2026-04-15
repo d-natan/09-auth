@@ -1,3 +1,5 @@
+export type NoteTag = "Work" | "Personal" | "Meeting" | "Shopping";
+
 export type Note = {
   id: string;
   title: string;
