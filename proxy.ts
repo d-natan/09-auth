@@ -1,46 +1,42 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { checkSession } from "@/lib/api/serverApi";
 
-export function proxy(request: NextRequest) {
-  const token =
-    request.cookies.get("token");
+const privateRoutes = ["/profile", "/notes"];
+const authRoutes = ["/sign-in", "/sign-up"];
 
-  const isAuthPage =
-    request.nextUrl.pathname.startsWith(
-      "/sign-in"
-    ) ||
-    request.nextUrl.pathname.startsWith(
-      "/sign-up"
-    );
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
 
-  const isPrivate =
-    request.nextUrl.pathname.startsWith(
-      "/profile"
-    ) ||
-    request.nextUrl.pathname.startsWith(
-      "/notes"
-    );
+  const accessToken = request.cookies.get("accessToken")?.value;
+  const refreshToken = request.cookies.get("refreshToken")?.value;
 
-  if (!token && isPrivate) {
-    return NextResponse.redirect(
-      new URL("/sign-in", request.url)
-    );
+  const isPrivateRoute = privateRoutes.some((route) =>
+    pathname.startsWith(route)
+  );
+
+  const isAuthRoute = authRoutes.some((route) =>
+    pathname.startsWith(route)
+  );
+
+  if (!accessToken && refreshToken) {
+    try {
+      await checkSession();
+    } catch {
+      return NextResponse.redirect(new URL("/sign-in", request.url));
+    }
   }
 
-  if (token && isAuthPage) {
-    return NextResponse.redirect(
-      new URL("/profile", request.url)
-    );
+  if (!accessToken && !refreshToken && isPrivateRoute) {
+    return NextResponse.redirect(new URL("/sign-in", request.url));
+  }
+
+  if (accessToken && isAuthRoute) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    "/profile/:path*",
-    "/notes/:path*",
-    "/sign-in",
-    "/sign-up",
-  ],
+  matcher: ["/profile/:path*", "/notes/:path*", "/sign-in", "/sign-up"],
 };

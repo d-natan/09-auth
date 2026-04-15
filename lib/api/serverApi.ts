@@ -1,20 +1,60 @@
-import axios from "axios";
+import { axiosInstance } from "./axiosInstance";
 import { cookies } from "next/headers";
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL + "/api";
+import { Note } from "@/types/note";
+import { User } from "@/types/user";
 
-export const serverApi = axios.create({
-  baseURL,
-});
+/**
+ * Формує Cookie header для server-side запитів
+ */
+async function getCookieHeader(): Promise<string> {
+  const cookieStore = await cookies();
 
-export const getMe = async () => {
-  const cookieStore = cookies();
+  return cookieStore
+    .getAll()
+    .map((c) => `${c.name}=${c.value}`)
+    .join("; ");
+}
 
-  const res = await serverApi.get("/users/me", {
+/**
+ * Отримати поточного користувача
+ */
+export async function getMe(): Promise<User> {
+  const cookieHeader = await getCookieHeader();
+
+  const res = await axiosInstance.get("/users/me", {
     headers: {
-      Cookie: cookieStore.toString(),
+      Cookie: cookieHeader,
     },
   });
 
   return res.data;
-};
+}
+
+/**
+ * Перевірка/оновлення сесії (refresh token flow)
+ */
+export async function checkSession(): Promise<void> {
+  const cookieHeader = await getCookieHeader();
+
+  await axiosInstance.get("/auth/refresh", {
+    headers: {
+      Cookie: cookieHeader,
+    },
+  });
+}
+
+/**
+ * Отримати нотатку по ID
+ */
+export async function fetchNoteById(id: string): Promise<Note> {
+  const cookieHeader = await getCookieHeader();
+
+  const res = await axiosInstance.get(`/notes/${id}`, {
+    headers: {
+      Cookie: cookieHeader,
+    },
+  });
+
+  return res.data;
+}

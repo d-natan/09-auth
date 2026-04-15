@@ -1,48 +1,62 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { checkSession } from "@/lib/api/clientApi";
+import { ReactNode, useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+
+import { checkSession, getMe } from "@/lib/api/clientApi";
 import { useAuthStore } from "@/lib/store/authStore";
 
-export default function AuthProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const [loading, setLoading] =
-    useState(true);
+interface Props {
+  children: ReactNode;
+}
 
-  const setUser = useAuthStore(
-    (s) => s.setUser
-  );
+export default function AuthProvider({ children }: Props) {
+  const router = useRouter();
+  const pathname = usePathname();
 
-  const clearIsAuthenticated =
-    useAuthStore(
-      (s) => s.clearIsAuthenticated
-    );
+  const { setUser, clearIsAuthenticated } = useAuthStore();
+
+  const [loading, setLoading] = useState(true);
+
+  const isPrivateRoute =
+    pathname.startsWith("/profile") || pathname.startsWith("/notes");
 
   useEffect(() => {
-  const verify = async () => {
-    try {
-      const user = await checkSession();
+    const verifyAuth = async () => {
+      try {
+        // 1. перевіряємо сесію (refreshToken логіка на бекенді)
+        await checkSession();
 
-      if (user) {
+        // 2. якщо сесія валідна — отримуємо користувача
+        const user = await getMe();
+
         setUser(user);
-      } else {
+      } catch {
+        // якщо щось не так — очищаємо стан
         clearIsAuthenticated();
+      } finally {
+        setLoading(false);
       }
-    } catch {
-      clearIsAuthenticated();
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  verify();
-}, [setUser, clearIsAuthenticated]);
+    verifyAuth();
+  }, [setUser, clearIsAuthenticated]);
+
+  // якщо користувач не авторизований і йде в приватний роут
+  useEffect(() => {
+    if (!loading && isPrivateRoute) {
+      const tokenExists = document.cookie.includes("accessToken");
+
+      if (!tokenExists) {
+        clearIsAuthenticated();
+        router.replace("/sign-in");
+      }
+    }
+  }, [loading, isPrivateRoute, router, clearIsAuthenticated]);
+
   if (loading) {
     return <p>Loading...</p>;
   }
 
-  return children;
+  return <>{children}</>;
 }

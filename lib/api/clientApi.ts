@@ -1,5 +1,6 @@
 import { api } from "./api";
 import { User } from "@/types/user";
+import { Note } from "@/types/note";
 
 interface AuthRequest {
   email: string;
@@ -43,16 +44,6 @@ export const updateMe = async (
 
   return res.data;
 };
-
-// NOTES TYPES
-export interface Note {
-  id: string;
-  title: string;
-  content: string;
-  tag: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 // GET all notes
 export const fetchNotes = async (params: {
