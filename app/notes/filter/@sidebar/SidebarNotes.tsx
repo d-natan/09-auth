@@ -4,7 +4,6 @@ import type { NoteTag } from "@/types/note";
 
 const tags: (NoteTag | "all")[] = [
   "all",
-  "Todo",
   "Work",
   "Personal",
   "Meeting",
