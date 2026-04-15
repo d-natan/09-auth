@@ -1,4 +1,4 @@
-export default function SidebarDefault() {
+export default function Sidebar() {
   return (
     <div>
       <h3>Sidebar</h3>
@@ -6,6 +6,8 @@ export default function SidebarDefault() {
         <li>All</li>
         <li>Todo</li>
         <li>Work</li>
+        <li>Personal</li>
+        <li>Meeting</li>
       </ul>
     </div>
   );
