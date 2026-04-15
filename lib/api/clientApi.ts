@@ -43,3 +43,55 @@ export const updateMe = async (
 
   return res.data;
 };
+
+// NOTES TYPES
+interface Note {
+  id: string;
+  title: string;
+  content: string;
+  tag: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// GET all notes
+export const fetchNotes = async (params: {
+  page?: number;
+  search?: string;
+  tag?: string;
+}) => {
+  const res = await api.get("/notes", {
+    params: {
+      perPage: 12,
+      ...params,
+    },
+  });
+
+  return res.data;
+};
+
+// GET note by id
+export const fetchNoteById = async (
+  id: string
+): Promise<Note> => {
+  const res = await api.get(`/notes/${id}`);
+  return res.data;
+};
+
+// CREATE note
+export const createNote = async (data: {
+  title: string;
+  content: string;
+  tag: string;
+}): Promise<Note> => {
+  const res = await api.post("/notes", data);
+  return res.data;
+};
+
+// DELETE note
+export const deleteNote = async (
+  id: string
+): Promise<Note> => {
+  const res = await api.delete(`/notes/${id}`);
+  return res.data;
+};

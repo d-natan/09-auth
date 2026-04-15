@@ -1,15 +1,29 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { useDebouncedCallback } from "use-debounce";
-import Link from "next/link";
 
-import { fetchNotes, FetchNotesResponse } from "@/lib/api";
+import { fetchNotes } from "@/lib/api/clientApi";
 
 import SearchBox from "@/components/SearchBox/SearchBox";
 import NoteList from "@/components/NoteList/NoteList";
 import Pagination from "@/components/Pagination/Pagination";
+
+type Note = {
+  id: string;
+  title: string;
+  content: string;
+  tag: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type NotesResponse = {
+  notes: Note[];
+  totalPages: number;
+};
 
 export default function NotesClient({ tag }: { tag: string }) {
   const [page, setPage] = useState(1);
@@ -20,7 +34,7 @@ export default function NotesClient({ tag }: { tag: string }) {
     setPage(1);
   }, 500);
 
-  const { data, isLoading, isError } = useQuery<FetchNotesResponse>({
+  const { data, isLoading, isError } = useQuery<NotesResponse>({
     queryKey: ["notes", page, search, tag],
     queryFn: () =>
       fetchNotes({
@@ -41,7 +55,7 @@ export default function NotesClient({ tag }: { tag: string }) {
 
       <SearchBox onSearch={debouncedSearch} />
 
-      {data?.notes.length ? (
+      {data?.notes?.length ? (
         <NoteList notes={data.notes} />
       ) : (
         <p>No notes found</p>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { fetchNoteById } from "@/lib/api/notes";
+import { fetchNoteById } from "@/lib/api/clientApi";
 
 type Props = {
   params: {
