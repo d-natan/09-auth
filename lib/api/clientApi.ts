@@ -45,7 +45,7 @@ export const updateMe = async (
 };
 
 // NOTES TYPES
-interface Note {
+export interface Note {
   id: string;
   title: string;
   content: string;
