@@ -1,4 +1,3 @@
-import { cookies } from "next/headers";
 import {
   dehydrate,
   HydrationBoundary,
@@ -16,18 +15,12 @@ export default async function Page({
   const { id } = params;
 
   // ✅ FIX: await cookies()
-  const cookieStore = await cookies();
-
-  const cookieHeader = cookieStore
-    .getAll()
-    .map((c) => `${c.name}=${c.value}`)
-    .join("; ");
 
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery({
     queryKey: ["note", id],
-    queryFn: () => fetchNoteById(id, cookieHeader),
+    queryFn: () => fetchNoteById(id),
   });
 
   return (
