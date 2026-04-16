@@ -1,29 +1,38 @@
+import { cookies } from "next/headers";
 import {
+  dehydrate,
   HydrationBoundary,
   QueryClient,
-  dehydrate,
 } from "@tanstack/react-query";
 
 import { fetchNoteById } from "@/lib/api/serverApi";
-import NotePreview from "./NotePreview.client";
+import NotePreviewClient from "./NotePreview.client";
 
 export default async function Page({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }) {
-  const { id } = await params;
+  const { id } = params;
+
+  // ✅ FIX: cookies must be awaited
+  const cookieStore = await cookies();
+
+  const cookieHeader = cookieStore
+    .getAll()
+    .map((c) => `${c.name}=${c.value}`)
+    .join("; ");
 
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery({
     queryKey: ["note", id],
-    queryFn: () => fetchNoteById(id),
+    queryFn: () => fetchNoteById(id, cookieHeader), // ✅ FIX HERE
   });
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <NotePreview id={id} />
+      <NotePreviewClient id={id} />
     </HydrationBoundary>
   );
 }
