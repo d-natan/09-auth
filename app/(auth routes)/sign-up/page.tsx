@@ -1,67 +1,93 @@
 "use client";
 
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import css from "./SignUpPage.module.css";
-import { register } from "@/lib/api/clientApi";
+
+import { register, getMe } from "@/lib/api/clientApi";
+import { useAuthStore } from "@/lib/store/authStore";
 
 export default function SignUpPage() {
   const router = useRouter();
 
-  const [error, setError] = useState<string>("");
+  const setUser = useAuthStore((state) => state.setUser);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+
+  const [error, setError] = useState<string | null>(
+    null
+  );
+
+  const [loading, setLoading] =
+    useState<boolean>(false);
+
+  async function handleSubmit(
+    e: FormEvent<HTMLFormElement>
+  ): Promise<void> {
     e.preventDefault();
 
-    const formData = new FormData(e.currentTarget);
-
-    const email = String(formData.get("email"));
-    const password = String(formData.get("password"));
+    setError(null);
+    setLoading(true);
 
     try {
-      await register({ email, password });
+      await register({
+        email,
+        password,
+      });
+
+      // 🔥 ОБОВ'ЯЗКОВО
+      const user = await getMe();
+
+      // 🔥 ОБОВ'ЯЗКОВО
+      setUser(user);
 
       router.push("/profile");
     } catch {
-      setError("Registration failed. Try again.");
+      setError("Registration failed");
+    } finally {
+      setLoading(false);
     }
-  };
+  }
 
   return (
-    <main className={css.mainContent}>
-      <h1 className={css.formTitle}>Sign up</h1>
+    <div>
+      <h1>Sign Up</h1>
 
-      <form className={css.form} onSubmit={handleSubmit}>
-        <div className={css.formGroup}>
-          <label htmlFor="email">Email</label>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>Email</label>
+
           <input
-            id="email"
             type="email"
             name="email"
-            className={css.input}
+            value={email}
             required
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
           />
         </div>
 
-        <div className={css.formGroup}>
-          <label htmlFor="password">Password</label>
+        <div>
+          <label>Password</label>
+
           <input
-            id="password"
             type="password"
             name="password"
-            className={css.input}
+            value={password}
             required
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
           />
         </div>
 
-        <div className={css.actions}>
-          <button type="submit" className={css.submitButton}>
-            Register
-          </button>
-        </div>
+        <button type="submit" disabled={loading}>
+          {loading ? "Loading..." : "Sign Up"}
+        </button>
 
-        {error && <p className={css.error}>{error}</p>}
+        {error && <p>{error}</p>}
       </form>
-    </main>
+    </div>
   );
 }
