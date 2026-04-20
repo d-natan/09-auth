@@ -9,14 +9,18 @@ import { useAuthStore } from "@/lib/store/authStore";
 export default function SignInPage() {
   const router = useRouter();
 
-  const setUser = useAuthStore((state) => state.setUser);
-
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-
-  const [error, setError] = useState<string | null>(
-    null
+  const setUser = useAuthStore(
+    (state) => state.setUser
   );
+
+  const [email, setEmail] =
+    useState<string>("");
+
+  const [password, setPassword] =
+    useState<string>("");
+
+  const [error, setError] =
+    useState<string | null>(null);
 
   const [loading, setLoading] =
     useState<boolean>(false);
@@ -35,15 +39,22 @@ export default function SignInPage() {
         password,
       });
 
-      // 🔥 ОБОВ'ЯЗКОВО: отримати користувача
+      // отримуємо поточного користувача
       const user = await getMe();
 
-      // 🔥 ОБОВ'ЯЗКОВО: зберегти в store
+      // зберігаємо у глобальному store
       setUser(user);
 
+      // редірект після логіну
       router.push("/profile");
-    } catch {
-      setError("Invalid email or password");
+
+    } catch (error) {
+      console.error(error);
+
+      setError(
+        "Invalid email or password"
+      );
+
     } finally {
       setLoading(false);
     }
@@ -55,38 +66,55 @@ export default function SignInPage() {
 
       <form onSubmit={handleSubmit}>
         <div>
-          <label>Email</label>
+          <label htmlFor="email">
+            Email
+          </label>
 
           <input
+            id="email"
             type="email"
             name="email"
             value={email}
             required
             onChange={(e) =>
-              setEmail(e.target.value)
+              setEmail(
+                e.target.value
+              )
             }
           />
         </div>
 
         <div>
-          <label>Password</label>
+          <label htmlFor="password">
+            Password
+          </label>
 
           <input
+            id="password"
             type="password"
             name="password"
             value={password}
             required
             onChange={(e) =>
-              setPassword(e.target.value)
+              setPassword(
+                e.target.value
+              )
             }
           />
         </div>
 
-        <button type="submit" disabled={loading}>
-          {loading ? "Loading..." : "Sign In"}
+        <button
+          type="submit"
+          disabled={loading}
+        >
+          {loading
+            ? "Loading..."
+            : "Sign In"}
         </button>
 
-        {error && <p>{error}</p>}
+        {error && (
+          <p>{error}</p>
+        )}
       </form>
     </div>
   );

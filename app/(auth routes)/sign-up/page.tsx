@@ -9,14 +9,18 @@ import { useAuthStore } from "@/lib/store/authStore";
 export default function SignUpPage() {
   const router = useRouter();
 
-  const setUser = useAuthStore((state) => state.setUser);
-
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-
-  const [error, setError] = useState<string | null>(
-    null
+  const setUser = useAuthStore(
+    (state) => state.setUser
   );
+
+  const [email, setEmail] =
+    useState<string>("");
+
+  const [password, setPassword] =
+    useState<string>("");
+
+  const [error, setError] =
+    useState<string | null>(null);
 
   const [loading, setLoading] =
     useState<boolean>(false);
@@ -35,14 +39,13 @@ export default function SignUpPage() {
         password,
       });
 
-      // 🔥 ОБОВ'ЯЗКОВО
       const user = await getMe();
 
-      // 🔥 ОБОВ'ЯЗКОВО
       setUser(user);
 
       router.push("/profile");
-    } catch {
+    } catch (error) {
+      console.error(error);
       setError("Registration failed");
     } finally {
       setLoading(false);
@@ -82,8 +85,13 @@ export default function SignUpPage() {
           />
         </div>
 
-        <button type="submit" disabled={loading}>
-          {loading ? "Loading..." : "Sign Up"}
+        <button
+          type="submit"
+          disabled={loading}
+        >
+          {loading
+            ? "Loading..."
+            : "Sign Up"}
         </button>
 
         {error && <p>{error}</p>}

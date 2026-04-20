@@ -13,6 +13,15 @@ export async function proxy(request: NextRequest) {
   const refreshToken =
     cookieStore.get("refreshToken")?.value;
 
+  const cookieHeader =
+    cookieStore
+      .getAll()
+      .map(
+        (cookie) =>
+          `${cookie.name}=${cookie.value}`
+      )
+      .join("; ");
+
   const isAuthRoute =
     pathname.startsWith("/sign-in") ||
     pathname.startsWith("/sign-up");
@@ -29,7 +38,8 @@ export async function proxy(request: NextRequest) {
 
   if (!accessToken && refreshToken) {
     try {
-      const response = await checkSession();
+      const response =
+        await checkSession(cookieHeader);
 
       const res = NextResponse.next();
 
@@ -62,7 +72,7 @@ export async function proxy(request: NextRequest) {
 
   if ((accessToken || refreshToken) && isAuthRoute) {
     return NextResponse.redirect(
-      new URL("/", request.url)
+      new URL("/profile", request.url)
     );
   }
 

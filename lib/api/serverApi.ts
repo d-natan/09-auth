@@ -1,53 +1,60 @@
-import { cookies } from "next/headers";
 import { axiosInstance } from "./axiosInstance";
-
 import type { Note } from "@/types/note";
 import type { User } from "@/types/user";
+import type { AxiosResponse } from "axios";
 
-async function getCookieHeader(): Promise<string> {
-  const cookieStore = await cookies();
-
-  return cookieStore
-    .getAll()
-    .map((c) => `${c.name}=${c.value}`)
-    .join("; ");
-}
-
+// =====================
 // USER
-export async function getMe(): Promise<User> {
-  const cookieHeader = await getCookieHeader();
+// =====================
 
-  const res = await axiosInstance.get("/users/me", {
-    headers: {
-      Cookie: cookieHeader,
-    },
-  });
+export async function getMe(
+  cookieHeader: string
+): Promise<User> {
+  const res = await axiosInstance.get(
+    "/users/me",
+    {
+      headers: {
+        Cookie: cookieHeader,
+      },
+    }
+  );
 
   return res.data;
 }
 
-// SESSION (ВАЖЛИВО: повертає відповідь)
-export async function checkSession() {
-  const cookieHeader = await getCookieHeader();
+// =====================
+// SESSION
+// =====================
 
-  const res = await axiosInstance.get("/auth/session", {
-    headers: {
-      Cookie: cookieHeader,
-    },
-  });
-
-  return res;
+export async function checkSession(
+  cookieHeader: string
+): Promise<AxiosResponse> {
+  return axiosInstance.get(
+    "/auth/session",
+    {
+      headers: {
+        Cookie: cookieHeader,
+      },
+    }
+  );
 }
 
-// NOTES
-export async function fetchNoteById(id: string): Promise<Note> {
-  const cookieHeader = await getCookieHeader();
+// =====================
+// NOTE
+// =====================
 
-  const res = await axiosInstance.get(`/notes/${id}`, {
-    headers: {
-      Cookie: cookieHeader,
-    },
-  });
+export async function fetchNoteById(
+  id: string,
+  cookieHeader: string
+): Promise<Note> {
+  const res = await axiosInstance.get(
+    `/notes/${id}`,
+    {
+      headers: {
+        Cookie: cookieHeader,
+      },
+    }
+  );
 
   return res.data;
 }
