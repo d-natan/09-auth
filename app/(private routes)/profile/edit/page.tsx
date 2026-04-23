@@ -36,7 +36,7 @@ export default function EditProfilePage() {
     try {
       const updatedUser =
         await updateProfile({
-          name,
+          username: name,
         });
 
       setUser(updatedUser);
