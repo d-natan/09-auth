@@ -2,14 +2,16 @@ import { axiosInstance } from "./axiosInstance";
 import type { Note } from "@/types/note";
 import type { User } from "@/types/user";
 import type { AxiosResponse } from "axios";
+import { cookies } from "next/headers";
 
-// =====================
-// USER
-// =====================
+export async function getMe(): Promise<User> {
+  const cookieStore = await cookies();
 
-export async function getMe(
-  cookieHeader: string
-): Promise<User> {
+  const cookieHeader = cookieStore
+    .getAll()
+    .map(({ name, value }) => `${name}=${value}`)
+    .join("; ");
+
   const res = await axiosInstance.get(
     "/users/me",
     {
@@ -22,13 +24,14 @@ export async function getMe(
   return res.data;
 }
 
-// =====================
-// SESSION
-// =====================
+export async function checkSession(): Promise<AxiosResponse> {
+  const cookieStore = await cookies();
 
-export async function checkSession(
-  cookieHeader: string
-): Promise<AxiosResponse> {
+  const cookieHeader = cookieStore
+    .getAll()
+    .map(({ name, value }) => `${name}=${value}`)
+    .join("; ");
+
   return axiosInstance.get(
     "/auth/session",
     {
@@ -39,14 +42,16 @@ export async function checkSession(
   );
 }
 
-// =====================
-// NOTE
-// =====================
-
 export async function fetchNoteById(
-  id: string,
-  cookieHeader: string
+  id: string
 ): Promise<Note> {
+  const cookieStore = await cookies();
+
+  const cookieHeader = cookieStore
+    .getAll()
+    .map(({ name, value }) => `${name}=${value}`)
+    .join("; ");
+
   const res = await axiosInstance.get(
     `/notes/${id}`,
     {

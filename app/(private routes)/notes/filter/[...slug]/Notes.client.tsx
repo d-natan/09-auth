@@ -95,17 +95,21 @@ export default function NotesClient() {
       </Link>
 
       <SearchBox
-        value={search}
-        onChange={handleSearchChange}
+      value={search}
+      onChange={handleSearchChange}
       />
 
-      <NoteList notes={data.notes} />
+      {data.notes.length > 0 && (
+        <div>
+          <NoteList notes={data.notes} />
 
-      <Pagination
-        currentPage={page}
-        totalPages={data.totalPages}
-        onPageChange={handlePageChange}
-      />
+          <Pagination
+          currentPage={page}
+          totalPages={data.totalPages}
+          onPageChange={handlePageChange}
+          />
+        </div>
+      )}
     </div>
   );
 }

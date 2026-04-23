@@ -72,7 +72,7 @@ export async function proxy(request: NextRequest) {
 
   if ((accessToken || refreshToken) && isAuthRoute) {
     return NextResponse.redirect(
-      new URL("/profile", request.url)
+      new URL("/", request.url)
     );
   }
 

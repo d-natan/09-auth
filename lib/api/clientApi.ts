@@ -3,39 +3,37 @@ import { axiosInstance } from "./axiosInstance";
 import type { Note } from "@/types/note";
 import type { User } from "@/types/user";
 
-// =====================
-// AUTH
-// =====================
-
 export async function register(data: {
   email: string;
   password: string;
-}): Promise<void> {
-  await axiosInstance.post(
+}): Promise<User> {
+  const res = await axiosInstance.post(
     "/auth/register",
     data
   );
+
+  return res.data;
 }
 
 export async function login(data: {
   email: string;
   password: string;
-}): Promise<void> {
-  await axiosInstance.post(
+}): Promise<User> {
+  const res = await axiosInstance.post(
     "/auth/login",
     data
   );
+
+  return res.data;
 }
 
-export async function logout(): Promise<void> {
-  await axiosInstance.post(
+export async function logout(): Promise<User> {
+  const res = await axiosInstance.post(
     "/auth/logout"
   );
-}
 
-// =====================
-// USER
-// =====================
+  return res.data;
+}
 
 export async function getMe(): Promise<User> {
   const res =
@@ -47,20 +45,15 @@ export async function getMe(): Promise<User> {
 }
 
 export async function updateProfile(data: {
-  name: string;
+  username: string;
 }): Promise<User> {
-  const res =
-    await axiosInstance.patch(
-      "/users/me",
-      data
-    );
+  const res = await axiosInstance.patch(
+    "/users/me",
+    data
+  );
 
   return res.data;
 }
-
-// =====================
-// NOTES
-// =====================
 
 type FetchNotesParams = {
   page: number;
@@ -87,10 +80,6 @@ export async function fetchNotes(
   return res.data;
 }
 
-// =====================
-// CREATE NOTE
-// =====================
-
 export async function createNote(data: {
   title: string;
   content: string;
@@ -104,17 +93,16 @@ export async function createNote(data: {
   return res.data;
 }
 
-// DELETE NOTE
-
 export async function deleteNote(
   id: string
-): Promise<void> {
-  await axiosInstance.delete(
+): Promise<Note> {
+  const res = await axiosInstance.delete(
     `/notes/${id}`
   );
+
+  return res.data;
 }
 
-// CHECK SESSION
 export async function checkSession(): Promise<User> {
   const res = await axiosInstance.get(
     "/auth/session"
@@ -122,8 +110,6 @@ export async function checkSession(): Promise<User> {
 
   return res.data;
 }
-
-// 🔥 ВАЖЛИВО — ця функція була відсутня
 
 export async function fetchNoteById(
   id: string

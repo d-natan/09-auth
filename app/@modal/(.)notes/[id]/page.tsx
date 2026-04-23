@@ -5,38 +5,21 @@ import {
 } from "@tanstack/react-query";
 
 import { fetchNoteById } from "@/lib/api/serverApi";
-import { cookies } from "next/headers";
 
 import NotePreviewClient from "./NotePreview.client";
 
 export default async function Page({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const { id } = params;
-
-  const cookieStore = await cookies();
-
-  const cookieHeader =
-    cookieStore
-      .getAll()
-      .map(
-        (cookie) =>
-          `${cookie.name}=${cookie.value}`
-      )
-      .join("; ");
+  const { id } = await params;
 
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery({
     queryKey: ["note", id],
-
-    queryFn: () =>
-      fetchNoteById(
-        id,
-        cookieHeader
-      ),
+    queryFn: () => fetchNoteById(id),
   });
 
   return (
