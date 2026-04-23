@@ -13,15 +13,6 @@ export async function proxy(request: NextRequest) {
   const refreshToken =
     cookieStore.get("refreshToken")?.value;
 
-  const cookieHeader =
-    cookieStore
-      .getAll()
-      .map(
-        (cookie) =>
-          `${cookie.name}=${cookie.value}`
-      )
-      .join("; ");
-
   const isAuthRoute =
     pathname.startsWith("/sign-in") ||
     pathname.startsWith("/sign-up");
@@ -39,7 +30,7 @@ export async function proxy(request: NextRequest) {
   if (!accessToken && refreshToken) {
     try {
       const response =
-        await checkSession(cookieHeader);
+        await checkSession();
 
       const res = NextResponse.next();
 
