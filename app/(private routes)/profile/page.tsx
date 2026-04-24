@@ -1,9 +1,12 @@
 import { getMe } from "@/lib/api/serverApi";
 
-import { Metadata } from "next";
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Profile",
+  description: "User profile page",
 };
 
 export default async function ProfilePage() {
@@ -13,8 +16,20 @@ export default async function ProfilePage() {
     <div>
       <h1>Profile</h1>
 
-      <p>Email: {user.email}</p>
+      <Image
+        src={user.avatar}
+        alt="User avatar"
+        width={120}
+        height={120}
+      />
+
       <p>Username: {user.username}</p>
+
+      <p>Email: {user.email}</p>
+
+      <Link href="/profile/edit">
+        Edit profile
+      </Link>
     </div>
   );
 }

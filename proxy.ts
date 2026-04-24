@@ -32,7 +32,12 @@ export async function proxy(request: NextRequest) {
       const response =
         await checkSession();
 
-      const res = NextResponse.next();
+      const res =
+        isAuthRoute
+          ? NextResponse.redirect(
+              new URL("/", request.url)
+            )
+          : NextResponse.next();
 
       const setCookie =
         response.headers["set-cookie"];
