@@ -1,4 +1,4 @@
-import { axiosInstance } from "./axiosInstance";
+import { api } from "./api";
 
 import type { Note } from "@/types/note";
 import type { User } from "@/types/user";
@@ -7,7 +7,7 @@ export async function register(data: {
   email: string;
   password: string;
 }): Promise<User> {
-  const res = await axiosInstance.post(
+  const res = await api.post(
     "/auth/register",
     data
   );
@@ -19,7 +19,7 @@ export async function login(data: {
   email: string;
   password: string;
 }): Promise<User> {
-  const res = await axiosInstance.post(
+  const res = await api.post(
     "/auth/login",
     data
   );
@@ -28,7 +28,7 @@ export async function login(data: {
 }
 
 export async function logout(): Promise<User> {
-  const res = await axiosInstance.post(
+  const res = await api.post(
     "/auth/logout"
   );
 
@@ -37,7 +37,7 @@ export async function logout(): Promise<User> {
 
 export async function getMe(): Promise<User> {
   const res =
-    await axiosInstance.get(
+    await api.get(
       "/users/me"
     );
 
@@ -47,7 +47,7 @@ export async function getMe(): Promise<User> {
 export async function updateProfile(data: {
   username: string;
 }): Promise<User> {
-  const res = await axiosInstance.patch(
+  const res = await api.patch(
     "/users/me",
     data
   );
@@ -70,7 +70,7 @@ export async function fetchNotes(
   params: FetchNotesParams
 ): Promise<NotesResponse> {
   const res =
-    await axiosInstance.get(
+    await api.get(
       "/notes",
       {
         params,
@@ -85,7 +85,7 @@ export async function createNote(data: {
   content: string;
   tag: string;
 }): Promise<Note> {
-  const res = await axiosInstance.post(
+  const res = await api.post(
     "/notes",
     data
   );
@@ -96,7 +96,7 @@ export async function createNote(data: {
 export async function deleteNote(
   id: string
 ): Promise<Note> {
-  const res = await axiosInstance.delete(
+  const res = await api.delete(
     `/notes/${id}`
   );
 
@@ -104,7 +104,7 @@ export async function deleteNote(
 }
 
 export async function checkSession(): Promise<User> {
-  const res = await axiosInstance.get(
+  const res = await api.get(
     "/auth/session"
   );
 
@@ -115,7 +115,7 @@ export async function fetchNoteById(
   id: string
 ): Promise<Note> {
   const res =
-    await axiosInstance.get(
+    await api.get(
       `/notes/${id}`
     );
 

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import css from "./Header.module.css";
 
+import AuthNavigation from "../AuthNavigation/AuthNavigation";
+
 export default function Header() {
   return (
     <header className={css.header}>
@@ -9,9 +11,14 @@ export default function Header() {
           NoteHub
         </Link>
 
-        <Link href="/notes/filter/all" className={css.link}>
+        <Link
+          href="/notes/filter/all"
+          className={css.link}
+        >
           Notes
         </Link>
+
+        <AuthNavigation />
       </nav>
     </header>
   );
