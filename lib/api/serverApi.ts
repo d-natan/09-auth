@@ -1,4 +1,4 @@
-import { axiosInstance } from "./axiosInstance";
+import { api } from "./api";
 import type { Note } from "@/types/note";
 import type { User } from "@/types/user";
 import type { AxiosResponse } from "axios";
@@ -16,7 +16,7 @@ async function getCookieHeader(): Promise<string> {
 export async function getMe(): Promise<User> {
   const cookieHeader = await getCookieHeader();
 
-  const res = await axiosInstance.get(
+  const res = await api.get(
     "/users/me",
     {
       headers: {
@@ -31,7 +31,7 @@ export async function getMe(): Promise<User> {
 export async function checkSession(): Promise<AxiosResponse> {
   const cookieHeader = await getCookieHeader();
 
-  return axiosInstance.get(
+  return api.get(
     "/auth/session",
     {
       headers: {
@@ -46,7 +46,7 @@ export async function fetchNoteById(
 ): Promise<Note> {
   const cookieHeader = await getCookieHeader();
 
-  const res = await axiosInstance.get(
+  const res = await api.get(
     `/notes/${id}`,
     {
       headers: {
