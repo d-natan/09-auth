@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { fetchNotes } from "@/lib/api/clientApi";
-import styles from "@/styles/NotesPage.module.css";
+import styles from "./NotesPage.module.css"; 
 import Link from "next/link";
 
 import NoteList from "@/components/NoteList/NoteList";
@@ -45,7 +45,10 @@ export default function NotesClient({ tag }: { tag: string }) {
       <h1>Notes</h1>
 
       <div className={styles.toolbar}>
-        <SearchBox onChange={setSearch} />
+        <SearchBox
+        value={search}
+        onChange={setSearch}
+        />
 
         <Link href="/notes/action/create">
           <button>Add note</button>
