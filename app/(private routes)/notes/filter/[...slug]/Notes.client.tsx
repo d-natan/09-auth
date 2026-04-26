@@ -1,41 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-
+import { useState, useEffect } from "react";
 import { fetchNotes } from "@/lib/api/clientApi";
+import styles from "@/styles/NotesPage.module.css";
+import Link from "next/link";
 
+import NoteList from "@/components/NoteList/NoteList";
 import SearchBox from "@/components/SearchBox/SearchBox";
 import Pagination from "@/components/Pagination/Pagination";
-import NoteList from "@/components/NoteList/NoteList";
 
-import { Note } from "@/types/note";
-
-type NotesResponse = {
-  notes: Note[];
-  totalPages: number;
-};
-
-export default function NotesClient() {
-  const params = useParams();
-
-  const slugParam = params?.slug;
-
-  const slug = Array.isArray(slugParam)
-    ? slugParam
-    : undefined;
-
-  const tag = slug?.[0];
-
-  const [page, setPage] = useState<number>(1);
-
-  const [search, setSearch] =
-    useState<string>("");
-
-  const [debouncedSearch, setDebouncedSearch] =
-    useState<string>("");
+export default function NotesClient({ tag }: { tag: string }) {
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -46,70 +24,45 @@ export default function NotesClient() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  const {
-    data,
-    isLoading,
-    isError,
-  } = useQuery<NotesResponse>({
-    queryKey: [
-      "notes",
-      page,
-      debouncedSearch,
-      tag,
-    ],
+  const normalizedTag = tag === "all" ? undefined : tag;
 
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["notes", page, normalizedTag, debouncedSearch],
     queryFn: () =>
       fetchNotes({
         page,
+        tag: normalizedTag,
         search: debouncedSearch,
-        tag,
       }),
+    placeholderData: (prev) => prev,
   });
 
-  function handleSearchChange(
-    value: string
-  ): void {
-    setSearch(value);
-  }
-
-  function handlePageChange(
-    newPage: number
-  ): void {
-    setPage(newPage);
-  }
-
-  if (isLoading) {
-    return <p>Loading...</p>;
-  }
-
-  if (isError || !data) {
-    return <p>Error loading notes</p>;
-  }
+  if (isLoading) return <p>Loading...</p>;
+  if (error instanceof Error) return <p>{error.message}</p>;
 
   return (
-    <div>
+    <>
       <h1>Notes</h1>
 
-      <Link href="/notes/action/create">
-        Create note
-      </Link>
+      <div className={styles.toolbar}>
+        <SearchBox onChange={setSearch} />
 
-      <SearchBox
-      value={search}
-      onChange={handleSearchChange}
-      />
+        <Link href="/notes/action/create">
+          <button>Add note</button>
+        </Link>
+      </div>
 
-      {data.notes.length > 0 && (
-        <div>
+      {data?.notes && data.notes.length > 0 && (
+        <>
           <NoteList notes={data.notes} />
 
           <Pagination
           currentPage={page}
           totalPages={data.totalPages}
-          onPageChange={handlePageChange}
-          />
-        </div>
+          onPageChange={setPage}
+        />
+        </>
       )}
-    </div>
+    </>
   );
 }

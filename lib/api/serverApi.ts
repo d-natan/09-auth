@@ -57,3 +57,28 @@ export async function fetchNoteById(
 
   return res.data;
 }
+
+export async function fetchNotes(
+  params: {
+    page: number;
+    search?: string;
+    tag?: string;
+  }
+): Promise<{
+  notes: Note[];
+  totalPages: number;
+}> {
+  const cookieHeader = await getCookieHeader();
+
+  const res = await api.get(
+    "/notes",
+    {
+      params,
+      headers: {
+        Cookie: cookieHeader,
+      },
+    }
+  );
+
+  return res.data;
+}
